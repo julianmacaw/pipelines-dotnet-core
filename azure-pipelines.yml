@@ -6,11 +6,17 @@
 trigger:
 - master
 
+variables:
+  # Azure service connection established during pipeline creation
+  azureSubscription: 'julianmacaw (37af6738-e544-401f-86bd-bd5822536c94)'
+  appName: 'wa-we-pbi-codequality-d-01'
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  buildConfiguration: 'Release'
+
 pool:
   vmImage: 'ubuntu-latest'
-
-variables:
-  buildConfiguration: 'Release'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -32,3 +38,10 @@ steps:
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'myWebsiteName'
+
+- task: AzureWebApp@1 # Add this at the end of your file
+  inputs:
+    azureSubscription: $(azureSubscription)
+    appType: webAppLinux
+    appName: $(appName)
+    package: $(System.ArtifactsDirectory)/**/*.zip
